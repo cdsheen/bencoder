@@ -1,17 +1,17 @@
-#!/usr/local/bin/php
+#!/usr/bin/php
 <?php
 
-# BENCODER v1.3 - Shen Cheng-Da (cdsheen at gmail.com)
-# Project home: http://bbs.giga.net.tw/bencoder.php
+# BENCODER v1.4 - Shen Cheng-Da (cdsheen at gmail.com)
+# Project home: http://bencoder.urdada.net/
 
-$title = 'BENCODER v1.3 - Encode your PHP script using bcompiler';
+$title = 'BENCODER v1.4 - Encode your PHP script using bcompiler';
 
 $help =	<<<HELP
 $title
 
-Usage: bencoder [-f] [-q] -o FILE    file1.php
-       bencoder [-f] [-q] -o OUTDIR  file1.php file2.php ...
-       bencoder [-f] [-q] -o OUTDIR  -s SRCDIR  [-e SUFFIX] [-r] [-c] [-l]
+Usage: bencoder [-f] [-t] [-q] -o FILE    file1.php
+       bencoder [-f] [-t] [-q] -o OUTDIR  file1.php file2.php ...
+       bencoder [-f] [-t] [-q] -o OUTDIR  -s SRCDIR  [-e SUFFIX] [-r] [-c] [-l]
 
   -o FILE   : the file name to write the encoded script
               (default to '-encoded.XXX' suffix)
@@ -22,6 +22,7 @@ Usage: bencoder [-f] [-q] -o FILE    file1.php
 
   -r        : encode directories recursively (no by default)
   -f        : force overwriting even if the target exists
+  -t        : truncate/keep only the basename of the file into the bytecode
   -e SUFFIX : encode the files with the SUFFIX extension only (default: php)
               (regular expression allowed, ex: "php|inc")
   -c        : copy files those shouldn't be encoded (no by default)
@@ -35,7 +36,8 @@ HELP;
 if( !function_exists( 'bcompiler_write_file' ) ) {
 	print "$title\n\n";
 	print "ERROR: Please install `bcompiler' before running this encoder\n\n";
-	print "  cmd> pecl install channel://pecl.php.net/bcompiler-0.8\n\n";
+	print "  cmd> pecl install channel://pecl.php.net/bcompiler-0.9.3\n\n";
+	print "You may also need `libbz2-dev' package to compile bcompiler\n\n";
 	exit;
 }
 
@@ -45,6 +47,7 @@ $infiles = array();
 $verbose = true;
 $compress = false;
 $follow_symlink = $force_overwrite = $copy_rest = $recursive = false;
+$basename = false;
 
 for( $i=1 ; $i < $_SERVER['argc']; $i++ ) {
 	switch( $_SERVER['argv'][$i] ) {
@@ -93,6 +96,12 @@ for( $i=1 ; $i < $_SERVER['argc']; $i++ ) {
 
 	case '-q':
 		$verbose = false;
+		break;
+
+	case '-t':
+		if( !function_exists('bcompiler_set_filename_handler') )
+			bencoder_error('please upgrade your bcompiler extension to support -t option');
+		$basename = true;
 		break;
 
 	default:
@@ -222,8 +231,11 @@ function bencoder_process_dir( $srcdir, $outdir ) {
 }
 
 function bcompiler_encode_file( $infile, $outfile ) {
-	global $compress;
+	global $basename, $compress;
 	$fh = fopen( $outfile, 'w');
+	if( $basename ) {
+		bcompiler_set_filename_handler('basename');
+	}
 	bcompiler_write_header($fh);
 	bcompiler_write_file($fh, $infile);
 	bcompiler_write_footer($fh);
