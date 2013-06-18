@@ -1,10 +1,10 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
-# BENCODER v1.4 - Shen Cheng-Da (cdsheen at gmail.com)
+# BENCODER v1.5 - Shen Cheng-Da (cdsheen at gmail.com)
 # Project home: http://bencoder.urdada.net/
 
-$title = 'BENCODER v1.4 - Encode your PHP script using bcompiler';
+$title = 'BENCODER v1.5 - Encode your PHP script using bcompiler';
 
 $help =	<<<HELP
 $title
@@ -36,7 +36,7 @@ HELP;
 if( !function_exists( 'bcompiler_write_file' ) ) {
 	print "$title\n\n";
 	print "ERROR: Please install `bcompiler' before running this encoder\n\n";
-	print "  cmd> pecl install channel://pecl.php.net/bcompiler-0.9.3\n\n";
+	print "  cmd> pecl install bcompiler\n\n";
 	print "You may also need `libbz2-dev' package to compile bcompiler\n\n";
 	exit;
 }
@@ -53,6 +53,11 @@ for( $i=1 ; $i < $_SERVER['argc']; $i++ ) {
 	switch( $_SERVER['argv'][$i] ) {
 	case '-h':
 		bencoder_print_usage();
+		break;
+
+	case '-v':
+		print "$title\n";
+                exit(0);
 		break;
 
 	case '-b':
