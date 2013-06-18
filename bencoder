@@ -1,10 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-# BENCODER v1.6 - Shen Cheng-Da (cdsheen at gmail.com)
-# Project home: http://bencoder.urdada.net/
+# bencoder - Encode your PHP script using bcompiler
+# Project home: https://github.com/cdsheen/bencoder
 
-$title = 'BENCODER v1.6 - Encode your PHP script using bcompiler';
+$title = 'BENCODER v1.7 - Encode your PHP script using bcompiler';
 
 $help =	<<<HELP
 $title
@@ -138,7 +138,7 @@ else {
 		bencoder_error("You should use `-o DIR' to specify the output directory");
 }
 
-if($outdir != '') {
+if($numfiles > 1 && $outdir != '') {
 	if(file_exists($outdir)) {
 		if(!is_dir($outdir))
 			bencoder_error("[$outdir] already exists and is not a directory");
